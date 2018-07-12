@@ -1,4 +1,5 @@
 # _*_ coding: utf-8 _*_
+import random
 
 # 创造型设计模式:
 # 提供实例化的方法，为适合的状况提供相应的对象创建方法。
@@ -10,26 +11,62 @@
 # 当一个类不知道它所必须创建的对象的类的时候
 # 当一个类希望由它的子类来指定它所创建的对象的时候
 
-class ChinaGetter:
-    def __init__(self):
-        self.trans = dict(dog="小狗", cat="小猫")
 
-    def get(self, msgid):
-        try:
-            return self.trans[msgid]
-        except KeyError:
-            return str(msgid)
+class PetShop:
+    def __init__(self, animal_factory=None):
+        """
+        pet_factory is our abstract factory. We can set it at will
+        :param animal_factory:
+        """
+        self.pet_factory = animal_factory
 
-class EnglishGetter:
-    def get(self, msgid):
-        return str(msgid)
+    def show_pet(self):
+        pet = self.pet_factory.get_pet()
+        print("This is a lovely", pet)
+        print("It says", pet.speak())
+        print("It eats", self.pet_factory.get_food())
 
-def get_localizer(language="English"):
-    languages = dict(English=EnglishGetter, China=ChinaGetter)
-    return languages[language]()
+
+class Dog:
+    def speak(self):
+        return "woof"
+
+    def __str__(self):
+        return "Dog"
+
+
+class Cat:
+    def speak(self):
+        return "meow"
+
+    def __str__(self):
+        return "Cat"
+
+
+class DogFactory:
+    def get_pet(self):
+        return Dog()
+
+    def get_food(self):
+        return "dog food"
+
+
+class CatFactory:
+    def get_pet(self):
+        return Cat()
+
+    def get_food(self):
+        return "cat food"
+
+
+def get_factory():
+    return random.choice([DogFactory, CatFactory])()
 
 
 if __name__ == '__main__':
-    e, g = get_localizer(), get_localizer("China")
-    for msgid in "dog cat parrot bear".split():
-        print(g.get(msgid))
+    shop = PetShop()
+    for i in range(3):
+        shop.pet_factory = get_factory()
+        shop.show_pet()
+        print("=" * 20)
+
